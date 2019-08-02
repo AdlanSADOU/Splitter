@@ -12,10 +12,10 @@
 using std::cout;
 using std::endl;
 
-void ParseXML();
+void ParseXML(char* m_XMLfile);
 void LoopPrintSpriteCoordinates();
 
-std::vector<unsigned char> Decode();
+std::vector<unsigned char> Decode(char* file);
 
 struct Sprite
 {
