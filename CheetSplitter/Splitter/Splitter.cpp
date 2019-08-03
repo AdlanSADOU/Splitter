@@ -2,22 +2,28 @@
 #include "Splitter.h"
 // TODOO:
 // Link Statically
-
+// more error checking
+// REMOVE DEPENCY ON MSVCP140.dll  (build independently of visual studio or Visual C++ Redistributable for Visual Studio 2015)
 ////////////////////////////////////////////////////////////////
 ////////////					MAIN FUNCTION
 int main(int argc, char* argv[])
 {
 	char a;
-	cout << "------------------------------------------------------" << endl;
-	cout << "Drag a .png spritecheet and .xml file containing positions and names\n" 
-		<< "a Sprites ouput directory will be created in the same directory as the 2 source files\n\n";
+	cout << "---------------------------/!\\--------------------------" << endl;
+	cout << "IMPORTANT: READ THIS BEFORE USING\n" << endl;
+
+	cout << "Drag both .png AND .xml files onto the executable SIMULTANEOUSLY.\n" 
+	     << "A Sprites ouput folder will be created IN THE SAME DIRECTORY AS BOTH SOURCE FILES\n\n";
+	cout << "---------------------------/!\\--------------------------\n" << endl;
+
+	
 
 	if (argc > 1)
 	{
-		cout <<" was provided file path: " << argv[1] << endl << endl;
+		cout <<" was provided file path: " << argv[1] << endl;
 		cout <<" was provided file path: " << argv[2] << endl << endl;
 
-			cout << "checking" << endl;
+			cout << "checking\n" << endl;
 		
 			try
 			{
@@ -46,7 +52,8 @@ int main(int argc, char* argv[])
 				throw e1;
 			}
 	}
-	else std::cerr << "no Images were provided" << endl;
+	else std::cerr << "No files were provided\n\nPlease close this program and drag both source files onto this executable SIMULTANEOUSLY,\nwhich will automatically launcg it\n" << endl;
+
 
 
 	//LoadImage()
@@ -74,6 +81,7 @@ std::vector<unsigned char> Decode(char* file)
 	unsigned mWidth = 0;
 	unsigned mHeight = 0;
 
+	system("DIR");
 
 	//lodepng::load_file(mPngFile, "Resources/sprites.png");
 	lodepng::load_file(mPngFile, file);
@@ -82,6 +90,7 @@ std::vector<unsigned char> Decode(char* file)
 		cout << "No files specified, or file not supported\n" << endl;
 		return std::vector<unsigned char>();
 	}
+	cout << "\n\n";
 	cout << lodepng_error_text(lodepng::decode(mDecodedImage, mWidth, mHeight, mPngFile)) << endl;
 	//cout << lodepng_error_text(lodepng::decompress(mOut, mDecodedImage)) << endl;      // NO NEED TO DECOMPRESS
 
@@ -95,11 +104,22 @@ std::vector<unsigned char> Decode(char* file)
 	int x = 0;
 	int y = 0;*/
 
-	system("mkdir Sprites");
-	cout << "Created Sprites folder in the same directory as the source files" << endl;
-	system("PAUSE");
-	cout << "Begin decoding" << endl;
+	cout << "\nPLEASE PROVIDE A FOLDER NAME(avoid spaces) AND HIT ENTER.\nThe named folder will be created under the same directory as the source files and will be the output folder.\n\n";
 
+	char mOutputFolder[50] = "d";
+	//char mkdir[50] = "mkdir ";
+	printf("folder name: ");
+	std::cin >> mOutputFolder;
+	//std::strncat(mkdir, mOutputFolder, 10);
+
+	//system(mkdir);
+	_mkdir(mOutputFolder);
+	std::strncat(mOutputFolder, "/", 1);
+
+	cout << "Created "<< mOutputFolder <<" folder in the same directory as the source files\n\n" << endl;
+	system("PAUSE");
+	cout << "Begin decoding at " << mOutputFolder<< "\n"<<endl;
+	system("PAUSE");
 	for (size_t k = 0; k < SpriteCoordinates.size(); k++)
 	{
 
@@ -123,10 +143,9 @@ std::vector<unsigned char> Decode(char* file)
 
 			lodepng::encode(mOut, mTestBuf, mDestWidth, mDestHeight);
 
-			
-			
-			lodepng::save_file(mOut, "Sprites/"+ mImageName);
-			cout << "Saved " << mImageName << endl;
+			lodepng::save_file(mOut, mOutputFolder + mImageName);
+			cout << "Saved at " << mOutputFolder + mImageName<< endl<<endl;
+			system("PAUSE");
 			
 			mOut.clear();
 			free(mTestBuf);

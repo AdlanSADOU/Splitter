@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <direct.h>
 
 using std::cout;
 using std::endl;
