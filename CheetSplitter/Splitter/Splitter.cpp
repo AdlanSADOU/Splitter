@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Splitter.h"
+// TODOO:
+// Link Statically
 
 ////////////////////////////////////////////////////////////////
 ////////////					MAIN FUNCTION
@@ -12,32 +14,39 @@ int main(int argc, char* argv[])
 
 	if (argc > 1)
 	{
-		//cout << "you have " << argc << " arguments. file path: " << argv[1] << endl << endl;
-		//cout << "you have " << argc << " arguments. file path: " << argv[2] << endl << endl;
+		cout <<" was provided file path: " << argv[1] << endl << endl;
+		cout <<" was provided file path: " << argv[2] << endl << endl;
+
 			cout << "checking" << endl;
-			
-			if (strstr(argv[1], ".xml"))
+		
+			try
 			{
-				if(argv[1])
-				ParseXML(argv[1]);
-				if(argv[2])
-				Decode(argv[2]);
+				if (strstr(argv[1], ".xml"))
+				{
+					if (argv[1])
+						ParseXML(argv[1]);
+					if (argv[2])
+						Decode(argv[2]);
+				}
+				else if (strstr(argv[2], ".xml"))
+				{
+					if (argv[2])
+						ParseXML(argv[2]);
+					if (argv[1])
+						Decode(argv[1]);
+				}
+				else
+				{
+					cout << "no math, file not supported... try with a .png!";
+					system("PAUSE");
+				}
 			}
-			else if (strstr(argv[2], ".xml"))
+			catch (const std::exception& e1)
 			{
-				if (argv[2])
-					ParseXML(argv[2]);
-				if (argv[1])
-					Decode(argv[1]);
-			}
-			else
-			{
-				cout << "no math, file not supported... try with a .png!";
-				system("PAUSE");
+				throw e1;
 			}
 	}
-
-	
+	else std::cerr << "no Images were provided" << endl;
 
 
 	//LoadImage()
