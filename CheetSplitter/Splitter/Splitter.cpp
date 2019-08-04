@@ -1,59 +1,36 @@
 #include "pch.h"
 #include "Splitter.h"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TODOO:
-// Link Statically
-// more error checking
-// REMOVE DEPENCY ON MSVCP140.dll  (build independently of visual studio or Visual C++ Redistributable for Visual Studio 2015)
-////////////////////////////////////////////////////////////////
-////////////					MAIN FUNCTION
+// DONE		Link Statically 
+// PARTIALLY	more error checking
+// MAYBE	REMOVE DEPENCY ON MSVCP140.dll  (build independently of visual studio or Visual C++ Redistributable for Visual Studio 2015)
+
+///////////////////////////////////////////////////////////////////////////////////////////
+////////////								MAIN FUNCTION
 int main(int argc, char* argv[])
 {
 	char a;
 	cout << "---------------------------/!\\--------------------------" << endl;
 	cout << "IMPORTANT: READ THIS BEFORE USING\n" << endl;
 
-	cout << "Drag both .png AND .xml files onto the executable SIMULTANEOUSLY.\n" 
-	     << "A Sprites ouput folder will be created IN THE SAME DIRECTORY AS BOTH SOURCE FILES\n\n";
+	cout << "Drag both .png AND .xml files SIMULTANEOUSLY onto this executable.\n" 
+	     << "A Sprites output folder will be created IN THE SAME DIRECTORY AS BOTH SOURCE FILES\n\n";
 	cout << "---------------------------/!\\--------------------------\n" << endl;
 
 	
-
-	if (argc > 1)
+	if (argc > 2)
+		ProcessFileArguments(argv);
+	else if (argc >= 2)
 	{
-		cout <<" was provided file path: " << argv[1] << endl;
-		cout <<" was provided file path: " << argv[2] << endl << endl;
-
-			cout << "checking\n" << endl;
-		
-			try
-			{
-				if (strstr(argv[1], ".xml"))
-				{
-					if (argv[1])
-						ParseXML(argv[1]);
-					if (argv[2])
-						Decode(argv[2]);
-				}
-				else if (strstr(argv[2], ".xml"))
-				{
-					if (argv[2])
-						ParseXML(argv[2]);
-					if (argv[1])
-						Decode(argv[1]);
-				}
-				else
-				{
-					cout << "no math, file not supported... try with a .png!";
-					system("PAUSE");
-				}
-			}
-			catch (const std::exception& e1)
-			{
-				throw e1;
-			}
+		cout << "Please close and drag both files SIMULTANEOUSLY\n" << endl;
 	}
-	else std::cerr << "No files were provided\n\nPlease close this program and drag both source files onto this executable SIMULTANEOUSLY,\nwhich will automatically launcg it\n" << endl;
+	else std::cerr << "No files were provided\n" 
+			  "\nPlease close this program and drag both source files SIMULTANEOUSLY onto this executable,"
+			  "\nwhich will automatically launch. it\n" << endl;
 
+	system("PAUSE");
 
 
 	//LoadImage()
@@ -64,14 +41,47 @@ int main(int argc, char* argv[])
 	
 	//LoopPrintSpriteCoordinates();
 	
-	system("PAUSE");
+	
 	
 	return 0;
+}
+void ProcessFileArguments(char ** argv)
+{
+	cout << "Was provided file path: " << argv[1] << endl;
+	cout << "Was provided file path: " << argv[2] << endl << endl;
+
+	cout << "checking\n" << endl;
+	try
+	{
+		if (strstr(argv[1], ".xml"))
+		{
+			if (argv[1])
+				ParseXML(argv[1]);
+			if (argv[2])
+				Splitter(argv[2]);
+		}
+		else if (strstr(argv[2], ".xml"))
+		{
+			if (argv[2])
+				ParseXML(argv[2]);
+			if (argv[1])
+				Splitter(argv[1]);
+		}
+		else
+		{
+			cout << "no match, file not supported... try with a .png!" << endl;
+			system("PAUSE");
+		}
+	}
+	catch (const std::exception& e1)
+	{
+		throw e1;
+	}
 }
 ////////////////////////////////////////////////
 
 
-std::vector<unsigned char> Decode(char* file)
+void Splitter(char* file)
 {
 	std::vector<unsigned char> mPngFile;
 	std::vector<unsigned char> mDecodedImage;
@@ -81,45 +91,38 @@ std::vector<unsigned char> Decode(char* file)
 	unsigned mWidth = 0;
 	unsigned mHeight = 0;
 
+
 	system("DIR");
 
-	//lodepng::load_file(mPngFile, "Resources/sprites.png");
+
 	lodepng::load_file(mPngFile, file);
 	if (mPngFile.empty())
 	{
-		cout << "No files specified, or file not supported\n" << endl;
-		return std::vector<unsigned char>();
+		cout <<endl << "No files specified, or file not supported\n" << endl;
+		return;
 	}
 	cout << "\n\n";
 	cout << lodepng_error_text(lodepng::decode(mDecodedImage, mWidth, mHeight, mPngFile)) << endl;
-	//cout << lodepng_error_text(lodepng::decompress(mOut, mDecodedImage)) << endl;      // NO NEED TO DECOMPRESS
 
 	
 	size_t mDecodedImageSize = mDecodedImage.size();
 	unsigned char* mybuf = new unsigned char[(mWidth*mHeight)*4];
 	std::copy(std::begin(mDecodedImage), std::end(mDecodedImage), mybuf);
 
-	/*int mDestWidth = 2048;
-	int mDestHeight = 2048;
-	int x = 0;
-	int y = 0;*/
 
 	cout << "\nPLEASE PROVIDE A FOLDER NAME(avoid spaces) AND HIT ENTER.\nThe named folder will be created under the same directory as the source files and will be the output folder.\n\n";
-
 	char mOutputFolder[50] = "d";
-	//char mkdir[50] = "mkdir ";
 	printf("folder name: ");
 	std::cin >> mOutputFolder;
-	//std::strncat(mkdir, mOutputFolder, 10);
-
-	//system(mkdir);
 	_mkdir(mOutputFolder);
 	std::strncat(mOutputFolder, "/", 1);
-
 	cout << "Created "<< mOutputFolder <<" folder in the same directory as the source files\n\n" << endl;
 	system("PAUSE");
 	cout << "Begin decoding at " << mOutputFolder<< "\n"<<endl;
 	system("PAUSE");
+
+
+
 	for (size_t k = 0; k < SpriteCoordinates.size(); k++)
 	{
 
@@ -132,31 +135,22 @@ std::vector<unsigned char> Decode(char* file)
 		unsigned char* mTestBuf = new unsigned char[mDestWidth*mDestHeight * 4];
 
 		for (size_t i = 0; i < mDestHeight; i++)
-		{
-
 			for (size_t j = 0; j < mDestWidth; j++)
-			{
 				*(unsigned long *)&mTestBuf[(j + i * mDestWidth) * 4] = *(unsigned long *)&mybuf[((x + j) + (y + i)*mWidth) * 4];
-			}
-
-		}
+		
 
 			lodepng::encode(mOut, mTestBuf, mDestWidth, mDestHeight);
-
 			lodepng::save_file(mOut, mOutputFolder + mImageName);
 			cout << "Saved at " << mOutputFolder + mImageName<< endl<<endl;
-			system("PAUSE");
+			//system("PAUSE");
 			
 			mOut.clear();
 			free(mTestBuf);
 
-		//size_t mMybufSize = sizeof() / sizeof(mybuf[0]);
-		/*for (size_t i = 0; i < 9223372036; i++)
-		{
-			std::cout << mybuf[i];
-		}*/
+		
 	}
-	return mDecodedImage;
+
+	cout << "Done...!" << endl;
 }
 
 
