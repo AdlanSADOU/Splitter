@@ -122,7 +122,6 @@ void Splitter(char* file)
 	system("PAUSE");
 
 
-
 	for (size_t k = 0; k < SpriteCoordinates.size(); k++)
 	{
 
@@ -146,8 +145,6 @@ void Splitter(char* file)
 			
 			mOut.clear();
 			free(mTestBuf);
-
-		
 	}
 
 	cout << "Done...!" << endl;

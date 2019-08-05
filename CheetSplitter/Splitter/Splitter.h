@@ -15,9 +15,7 @@ using std::endl;
 
 void ParseXML(char* m_XMLfile);
 void LoopPrintSpriteCoordinates();
-
 void Splitter(char* file);
-
 void ProcessFileArguments(char ** argv);
 
 struct Sprite
