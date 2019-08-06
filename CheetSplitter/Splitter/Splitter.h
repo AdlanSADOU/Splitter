@@ -17,6 +17,16 @@ void ParseXML(char* m_XMLfile);
 void LoopPrintSpriteCoordinates();
 void Splitter(char* file);
 void ProcessFileArguments(char ** argv);
+char* CreateFolder();
+
+std::vector<unsigned char> gPngFile;
+std::vector<unsigned char> gDecodedImage;
+std::vector<unsigned char> gOut;
+
+unsigned gDecodedImageWidth = 0;
+unsigned gDecodedImageHeight = 0;
+
+unsigned char* gOutBuffer;
 
 struct Sprite
 {

@@ -8,10 +8,11 @@
 // MAYBE	REMOVE DEPENCY ON MSVCP140.dll  (build independently of visual studio or Visual C++ Redistributable for Visual Studio 2015)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-////////////								MAIN FUNCTION
+////////////							MAIN FUNCTION
 int main(int argc, char* argv[])
 {
 	char a;
+
 	cout << "---------------------------/!\\--------------------------" << endl;
 	cout << "IMPORTANT: READ THIS BEFORE USING\n" << endl;
 
@@ -38,19 +39,17 @@ int main(int argc, char* argv[])
 	//CutImage()
 	//SaveImage();
 
-	
 	//LoopPrintSpriteCoordinates();
-	
-	
 	
 	return 0;
 }
 void ProcessFileArguments(char ** argv)
 {
 	cout << "Was provided file path: " << argv[1] << endl;
-	cout << "Was provided file path: " << argv[2] << endl << endl;
+	cout << "Was provided file path: " << argv[2] << endl;
+	cout << "\nchecking";
 
-	cout << "checking\n" << endl;
+
 	try
 	{
 		if (strstr(argv[1], ".xml"))
@@ -81,44 +80,25 @@ void ProcessFileArguments(char ** argv)
 ////////////////////////////////////////////////
 
 
-void Splitter(char* file)
+void Splitter(char* mFile)
 {
-	std::vector<unsigned char> mPngFile;
-	std::vector<unsigned char> mDecodedImage;
-	std::vector<unsigned char> mOut;
-
-	
-	unsigned mWidth = 0;
-	unsigned mHeight = 0;
-
-
-	system("DIR");
-
-
-	lodepng::load_file(mPngFile, file);
-	if (mPngFile.empty())
+	lodepng::load_file(gPngFile, mFile);
+	if (gPngFile.empty())
 	{
 		cout <<endl << "No files specified, or file not supported\n" << endl;
 		return;
 	}
 	cout << "\n\n";
-	cout << lodepng_error_text(lodepng::decode(mDecodedImage, mWidth, mHeight, mPngFile)) << endl;
+	cout << lodepng_error_text(lodepng::decode(gDecodedImage, gDecodedImageWidth, gDecodedImageHeight, gPngFile)) << endl;
 
 	
-	size_t mDecodedImageSize = mDecodedImage.size();
-	unsigned char* mybuf = new unsigned char[(mWidth*mHeight)*4];
-	std::copy(std::begin(mDecodedImage), std::end(mDecodedImage), mybuf);
+	gOutBuffer = new unsigned char[(gDecodedImageWidth*gDecodedImageHeight)*4];
+	std::copy(std::begin(gDecodedImage), std::end(gDecodedImage), gOutBuffer);
 
 
 	cout << "\nPLEASE PROVIDE A FOLDER NAME(avoid spaces) AND HIT ENTER.\nThe named folder will be created under the same directory as the source files and will be the output folder.\n\n";
-	char mOutputFolder[50] = "d";
-	printf("folder name: ");
-	std::cin >> mOutputFolder;
-	_mkdir(mOutputFolder);
-	std::strncat(mOutputFolder, "/", 1);
-	cout << "Created "<< mOutputFolder <<" folder in the same directory as the source files\n\n" << endl;
-	system("PAUSE");
-	cout << "Begin decoding at " << mOutputFolder<< "\n"<<endl;
+	std::string mOutputFodler =  CreateFolder();
+	
 	system("PAUSE");
 
 
@@ -135,25 +115,37 @@ void Splitter(char* file)
 
 		for (size_t i = 0; i < mDestHeight; i++)
 			for (size_t j = 0; j < mDestWidth; j++)
-				*(unsigned long *)&mTestBuf[(j + i * mDestWidth) * 4] = *(unsigned long *)&mybuf[((x + j) + (y + i)*mWidth) * 4];
+				*(unsigned long *)&mTestBuf[(j + i * mDestWidth) * 4] = *(unsigned long *)&gOutBuffer[((x + j) + (y + i)*gDecodedImageWidth) * 4];
 		
 
-			lodepng::encode(mOut, mTestBuf, mDestWidth, mDestHeight);
-			lodepng::save_file(mOut, mOutputFolder + mImageName);
-			cout << "Saved at " << mOutputFolder + mImageName<< endl<<endl;
-			//system("PAUSE");
+			lodepng::encode(gOut, mTestBuf, mDestWidth, mDestHeight);
+
+			//TODO:   CHECK IF FOLDER EXISTS !!!
+			lodepng::save_file(gOut, mOutputFodler + mImageName);
+			cout << "Saved at " << mOutputFodler + mImageName<< endl<<endl;
+
 			
-			mOut.clear();
+			gOut.clear();
 			free(mTestBuf);
 	}
 
 	cout << "Done...!" << endl;
 }
 
+char* CreateFolder()
+{
+	char mOutputFolder[50] = "a";
+	printf("Folder name: ");
+	std::cin >> mOutputFolder;
+	_mkdir(mOutputFolder);
+	std::strncat(mOutputFolder, "/", 1);
+	cout << "Created " << mOutputFolder << " folder in the same directory as the source files\n\n"
+		<< "\nBegin decoding at " << mOutputFolder << "\n" << endl;
+	return mOutputFolder;
+}
 
 void ParseXML(char* m_XMLfile)
 {
-	
 	tinyxml2::XMLDocument m_doc;
 	//m_doc.LoadFile("Resources/sprites.xml");
 	m_doc.LoadFile(m_XMLfile);
