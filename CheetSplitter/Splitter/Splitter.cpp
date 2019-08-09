@@ -23,13 +23,13 @@ int main(int argc, char* argv[])
 	
 	if (argc > 2)
 		ProcessFileArguments(argv);
-	else if (argc >= 2)
+	else if (argc <= 2)
 	{
 		cout << "Please close and drag both files SIMULTANEOUSLY\n" << endl;
 	}
-	else std::cerr << "No files were provided\n" 
-			  "\nPlease close this program and drag both source files SIMULTANEOUSLY onto this executable,"
-			  "\nwhich will automatically launch. it\n" << endl;
+	else std::cerr << "No files were provided\n"
+		"\nPlease close this program and drag both source files SIMULTANEOUSLY onto this executable," << endl;
+			  
 
 	system("PAUSE");
 
@@ -45,8 +45,9 @@ int main(int argc, char* argv[])
 }
 void ProcessFileArguments(char ** argv)
 {
-	cout << "Was provided file path: " << argv[1] << endl;
-	cout << "Was provided file path: " << argv[2] << endl;
+	cout << "Files :" << endl;
+	cout << argv[1] << endl;
+	cout << argv[2] << endl;
 	cout << "\nchecking";
 
 
@@ -68,7 +69,7 @@ void ProcessFileArguments(char ** argv)
 		}
 		else
 		{
-			cout << "no match, file not supported... try with a .png!" << endl;
+			cout << "no match, files not supported... try with a .png!" << endl;
 			system("PAUSE");
 		}
 	}
@@ -78,7 +79,6 @@ void ProcessFileArguments(char ** argv)
 	}
 }
 ////////////////////////////////////////////////
-
 
 void Splitter(char* mFile)
 {
