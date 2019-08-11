@@ -9,24 +9,17 @@
 #include <vector>
 #include <algorithm>
 #include <direct.h>
+#include <cassert>
 
 using std::cout;
 using std::endl;
 
-void ParseXML(char* m_XMLfile);
-void LoopPrintSpriteCoordinates();
-void Splitter(char* file);
-void ProcessFileArguments(char ** argv);
-char* CreateFolder();
-
-std::vector<unsigned char> gPngFile;
-std::vector<unsigned char> gDecodedImage;
-std::vector<unsigned char> gOut;
-
-unsigned gDecodedImageWidth = 0;
-unsigned gDecodedImageHeight = 0;
-
-unsigned char* gOutBuffer;
+struct DecIMG
+{
+	std::vector<unsigned char> Image;
+	unsigned Width = 0;
+	unsigned Height = 0;
+};
 
 struct Sprite
 {
@@ -37,6 +30,16 @@ struct Sprite
 	int height = 0;
 };
 
-std::vector<Sprite> SpriteCoordinates;
+void CoverMessage();
+void ParseXML(char* m_XMLfile);
+void LoopPrintSpriteCoordinates();
+std::shared_ptr<std::vector<unsigned char>> LoadImage(const char* mFile);
+Sprite GetSprite(std::string mName);
+void Splitter();
+void Start(int argc, char ** argv);
+char* CreateFolder();
+void SaveAllSprites();
+
+
 
 #endif
