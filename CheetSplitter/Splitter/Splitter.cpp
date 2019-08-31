@@ -62,11 +62,22 @@ void Start(int argc, char ** argv)
 	}
 	else if (argc <= 2)
 	{
-		cout << "Please close and drag both files (.png & .xml) SIMULTANEOUSLY\n\n" << endl;
+		cout << "---------------------------/!\\--------------------------\n"
+			"            IMPORTANT: READ THIS BEFORE USING\n\n"
+
+			"Drag both.png AND.xml files SIMULTANEOUSLY onto this executable.\n"
+			"A Sprites output folder will be created IN THE SAME DIRECTORY AS BOTH SOURCE FILES\n"
+
+				"------------------------ --/!\\--------------------------\n\n\n"
+
+			"No files were provided\n\n\n"
+
+			"Please close this program and drag both source files SIMULTANEOUSLY onto this executable,\n"
+			"which will automatically launch.it\n\n" << endl;
 	}
 	else std::cerr << "No files were provided\n"
 		"\nPlease close this program and drag both source files SIMULTANEOUSLY onto this executable," << endl;
-
+	
 	
 }
 ////////////////////////////////////////////////
