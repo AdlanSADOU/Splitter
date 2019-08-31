@@ -2,6 +2,7 @@
 #ifndef __SPLITTER_H
 #define __SPLITTER_H
 
+#include <Windows.h>
 #include "tinyxml2.h"
 #include "lodepng.h"
 #include <iostream>
@@ -30,15 +31,16 @@ struct Sprite
 	int height = 0;
 };
 
-void CoverMessage();
-void ParseXML(char* m_XMLfile);
-void LoopPrintSpriteCoordinates();
+
 std::shared_ptr<std::vector<unsigned char>> LoadImage(const char* mFile);
 Sprite GetSprite(std::string mName);
-void Splitter();
 void Start(int argc, char ** argv);
-char* CreateFolder();
+void LoopPrintSpriteCoordinates();
+void ParseXML(char* m_XMLfile);
 void SaveAllSprites();
+void AskSpriteName();
+void CoverMessage();
+void Splitter();
 
 
 

@@ -4,7 +4,7 @@
 int main(int argc, char* argv[])
 {
 	char a;
-#ifdef _DEBUG
+#ifdef NDEBUG 
 
 	argc = 3;
 	argv[1] = (char*)"C:/Users/fynes/Desktop/GAME/ASSETS/DO_NOT_MOD/sprites.png";
@@ -12,7 +12,6 @@ int main(int argc, char* argv[])
 
 #endif // DEBUG
 
-	
 	Start(argc, argv);
        	
 

@@ -16,7 +16,6 @@ std::vector<unsigned char> gOut;
 unsigned char* gDImgTempBuffer;
 
 
-
 /////////////////////////////////////////////////////
 
 void Start(int argc, char ** argv)
@@ -63,7 +62,7 @@ void Start(int argc, char ** argv)
 	}
 	else if (argc <= 2)
 	{
-		cout << "Please close and drag both files SIMULTANEOUSLY\n\n" << endl;
+		cout << "Please close and drag both files (.png & .xml) SIMULTANEOUSLY\n\n" << endl;
 	}
 	else std::cerr << "No files were provided\n"
 		"\nPlease close this program and drag both source files SIMULTANEOUSLY onto this executable," << endl;
@@ -75,6 +74,7 @@ void Start(int argc, char ** argv)
 
 
 	DecIMG DImage;
+	std::string mName;
 void Splitter()
 {
 	cout << lodepng_error_text(lodepng::decode(DImage.Image, DImage.Width, DImage.Height, gPngFile)) << endl;
@@ -84,12 +84,13 @@ void Splitter()
 	//Sprite sprite = GetSprite("TILE00614.png");
 	
 	int i=0;
-	std::string mName;
 
+	cout << "\n\nChoose an option\n";
+	cout << "-------------------------------------------------------";
 	cout << "\n1 > Extract all " << SpriteCoordinates.size() << " sprites." << endl;
-	cout << "2 > Extract one specific sprite." << endl;
+	cout << "2 > Extract one specific sprite by name. (ex: ICON00270.png)" << endl;
 
-	printf("\nEnter choice number: ");
+	printf("\nYour choice: ");
 	std::cin >> i;
 	switch (i)
 	{
@@ -97,18 +98,15 @@ void Splitter()
 		SaveAllSprites();
 		break;
 	case 2:
-		cout << "\nSprite name: ";
-		std::cin >> mName;
-		GetSprite(mName);
+		AskSpriteName();
 		break;
 	default:
 		break;
 	}
-
-	cout << "Done...!" << endl;
 }
 
-
+LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
+LARGE_INTEGER Frequency;
 
 void SaveAllSprites()
 {
@@ -122,6 +120,8 @@ void SaveAllSprites()
 	cout << "Created " << mOutputFolder << " folder in the same directory as the source files\n\n" << "\nBegin decoding at " << mOutputFolder << "\n" << endl;
 	system("PAUSE");
 
+	
+
 	for (size_t k = 0; k < SpriteCoordinates.size(); k++)
 	{
 
@@ -133,11 +133,9 @@ void SaveAllSprites()
 		int y = SpriteCoordinates.at(k).y;
 
 
-
 		cout << mImageName << " " << mDestHeight << " " << mDestWidth << " " << x << " " << y << endl;
 
 		unsigned char* mOutSpriteBuffer = new unsigned char[mDestWidth*mDestHeight * 4];
-
 
 
 		for (size_t i = 0; i < mDestHeight; i++)
@@ -155,14 +153,29 @@ void SaveAllSprites()
 
 		gOut.clear();
 		free(mOutSpriteBuffer);
+
+		
 	}
+
 }
 
+
+///////////////////////////////////////////////////////////////
+///// OPTIMIZATION ATEMPT
+/////               |cycles
+///// 32bit 1st Pass 93 438
+///// 64bit 1st Pass 108 931
+///// 64bit 2nd Pass
 
 Sprite GetSprite(std::string mName)
 {
 	//std::shared_ptr<Sprite> sprite;
 	Sprite sprite;
+	bool found = false;
+#ifdef DEBUG
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+#endif // DEBUG
 
 	for (size_t k = 0; k < SpriteCoordinates.size(); k++)
 	{
@@ -170,40 +183,67 @@ Sprite GetSprite(std::string mName)
 
 		if (mName == SpriteCoordinates.at(k).name)
 		{
+			found = true;
+
 			sprite.name	= SpriteCoordinates.at(k).name;
 			sprite.width	= SpriteCoordinates.at(k).width;
 			sprite.height	= SpriteCoordinates.at(k).height;
 			sprite.x	= SpriteCoordinates.at(k).x;
 			sprite.y	= SpriteCoordinates.at(k).y;
 			
-			cout << "foud " << sprite.name << " !" << endl;
-			break;
-		}	
-	}
+			//cout << "found " << sprite.name << " !" << endl;
 
-
-	/*DecIMG DImage;
-	cout << lodepng_error_text(lodepng::decode(DImage.Image, DImage.Width, DImage.Height, gPngFile)) << endl;
+			/*DecIMG DImage;
+			cout << lodepng_error_text(lodepng::decode(DImage.Image, DImage.Width, DImage.Height, gPngFile)) << endl;
 */
 
-	gDImgTempBuffer = new unsigned char[(DImage.Width*DImage.Height) * 4];
-	std::copy(std::begin(DImage.Image), std::end(DImage.Image), gDImgTempBuffer);
+			gDImgTempBuffer = new unsigned char[(DImage.Width*DImage.Height) * 4];
+			std::copy(std::begin(DImage.Image), std::end(DImage.Image), gDImgTempBuffer);
 
-	unsigned char* mOutSpriteBuffer = new unsigned char[sprite.width * sprite.height * 4];
+			unsigned char* mOutSpriteBuffer = new unsigned char[sprite.width * sprite.height * 4];
 
-	for (size_t i = 0; i < sprite.height; i++)
-		for (size_t j = 0; j < sprite.width; j++)
-			*(unsigned long *)&mOutSpriteBuffer[(j + i * sprite.width) * 4] = *(unsigned long *)&gDImgTempBuffer[((sprite.x + j) + (sprite.y + i)* DImage.Width) * 4];
+			for (size_t i = 0; i < sprite.height; i++)
+				for (size_t j = 0; j < sprite.width; j++)
+					*(unsigned long *)&mOutSpriteBuffer[(j + i * sprite.width) * 4] = *(unsigned long *)&gDImgTempBuffer[((sprite.x + j) + (sprite.y + i)* DImage.Width) * 4];
 
-	lodepng::encode(gOut, mOutSpriteBuffer, sprite.width, sprite.height);
+			lodepng::encode(gOut, mOutSpriteBuffer, sprite.width, sprite.height);
 
-	//TODO:   CHECK IF FOLDER EXISTS !!!
-	lodepng::save_file(gOut, sprite.name);
-	cout << "Saved at " << sprite.name << endl << endl;
+			//TODO:   CHECK IF FOLDER EXISTS !!!
+			lodepng::save_file(gOut, sprite.name);
+			cout << "Saved " << sprite.name << endl << endl;
+			
+
+			gOut.clear();
+			delete mOutSpriteBuffer;
+			
+			cout << "\nDone...!" << endl;
+			break;
+		}
+		
+	}
+#ifdef DEBUG
 
 
-	gOut.clear();
-	free(mOutSpriteBuffer);
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	LONGLONG Tick = ElapsedMicroseconds.QuadPart;
+	printf("\n%I64d Cycles: ", Tick);
+
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	ElapsedMicroseconds.QuadPart /= Frequency.QuadPart;
+	LONGLONG TicksPsecond = ElapsedMicroseconds.QuadPart;
+	printf("\n%I64d Cycles/s: ", TicksPsecond);
+#endif // DEBUG
+
+
+	printf("\n\n");
+	if(!found)
+	{
+		cout << "\nNo match. Are you sure about that name ?\n" << endl;
+		AskSpriteName();
+		
+	}
+	
 
 	return sprite;
 }
@@ -219,6 +259,7 @@ std::shared_ptr<std::vector<unsigned char>> LoadImage(const char* mFile)
 		cout << endl << "No files specified, or file not supported\n" << endl;
 		return pngFile;
 	}
+	cout << "Loaded .png file...!" << endl;
 	cout << "\n\n";
 
 	return pngFile;
@@ -226,23 +267,28 @@ std::shared_ptr<std::vector<unsigned char>> LoadImage(const char* mFile)
 
 
 
+void AskSpriteName()
+{
+	cout << "\nSprite name: ";
+	std::cin >> mName;
+	GetSprite(mName);
+}
+
+
+
 void CoverMessage()
 {
+	//cout << "Author: Adlan Sadou  (Khaldro)\n" << endl;
 	cout << "---------------------------/!\\--------------------------" << endl;
-	cout << "Author: Adlan Sadou  (Khaldro)" << endl;
-	cout << "---------------------------------------\n\n" << endl;
-	cout << "IMPORTANT: READ THIS BEFORE USING\n" << endl;
+	cout << "                READ THIS BEFORE USING\n" << endl;
 
-	cout << "Drag both .png AND .xml files SIMULTANEOUSLY onto this executable.\n"
-		<< "A Sprites output folder will be created IN THE SAME DIRECTORY AS BOTH SOURCE FILES\n\n";
+	cout << "Drag both .png AND .xml files SIMULTANEOUSLY onto this executable.\n";
+	cout << "A Sprites output folder will be created \nIN THE SAME DIRECTORY AS BOTH SOURCE FILES\n\n";
+	cout << "Individual Sprites are saved under the source files folder\n\n";
 	cout << "---------------------------/!\\--------------------------\n\n" << endl;
 }
 
-//char* CreateFolder()
-//{
-//	
-//	return mOutputFolder;
-//}
+
 
 void ParseXML(char* m_XMLfile)
 {
